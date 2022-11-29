@@ -1,5 +1,7 @@
 /* P1P2_Config.h
  *
+ * For H-Link: increased HB, CRC_GEN = 0x00
+ *
  * Copyright (c) 2019-2022 Arnold Niessen, arnold.niessen-at-gmail-dot-com - licensed under CC BY-NC-ND 4.0 with exceptions (see LICENSE.md)
  *
  * WARNING: P1P2-bridge-esp8266 is end-of-life, and will be replaced by P1P2MQTT
@@ -206,8 +208,8 @@ char mqttInputBinData[11]= "P1P2/X";  // default accepts input from any P1P2/X/#
 #define RX_BUFFER_SIZE 2048 // to avoid serial buffer overruns (512 is too small)
 #define MQTT_MIN_FREE_MEMORY 6000 // Must likely be more than 4kB, MQTT messages will not be transmitted if available memory is below this value
 #define MQTT_QOS 0 // QOS = 1 is too slow
-#define SERIAL_MAGICSTRING "1P2P" // Serial input of ATmega should start with SERIAL_MAGICSTRING, otherwise lines line is ignored by P1P2Monitor
-#define CRC_GEN 0xD9    // Default generator/Feed for CRC check; these values work at least for the Daikin hybrid
+#define SERIAL_MAGICSTRING "1P2P" // Each serial input line of ATmega should start with SERIAL_MAGICSTRING, otherwise it is ignored by P1P2Monitor
+#define CRC_GEN 0x00    // Default generator/Feed for CRC check; these values work at least for the Daikin hybrid
 #define CRC_FEED 0x00   // Define CRC_GEN to 0x00 means no CRC is checked when reading or added when writing
 #define SPRINT_VALUE_LEN 400 // max message length for informational and debugging output over P1P2/S, telnet, or serial
 #define MQTT_KEY_LEN 100
@@ -218,7 +220,7 @@ char mqttInputBinData[11]= "P1P2/X";  // default accepts input from any P1P2/X/#
 #endif
 #define MAX_COMMAND_LENGTH 252 // B command can be long
 #define RB 700     // max size of readBuffer (serial input from Arduino) (was 400, changed for long-scope-mode to 700)
-#define HB 33      // max size of hexbuf, same as P1P2Monitor (model-dependent? 24 might be sufficient)
+#define HB 65      // max size of hexbuf, same as P1P2Monitor (model-dependent? 24 might be sufficient)
 #define MQTT_RB 1024 // size of ring buffer for MQTT_INPUT_HEXDATA/MQTT_INPUT_BINDATA
 
 #define REBOOT_REASON_NOTSTORED 0xFE
