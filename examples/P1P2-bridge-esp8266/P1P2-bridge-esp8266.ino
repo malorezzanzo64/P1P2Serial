@@ -750,7 +750,7 @@ void handleCommand(char* cmdString) {
                 case 'V': Sprint_P(true, true, true, PSTR(WELCOMESTRING));
                           Sprint_P(true, true, true, PSTR("* [ESP] Compiled %s %s"), __DATE__, __TIME__);
 #ifdef E_SERIES
-                          Sprint_P(true, true, true, PSTR("* [ESP] E-Series"));
+                          Sprint_P(true, true, true, PSTR("* [ESP] E-Series/CRC=00"));
 #endif
 #ifdef F_SERIES
                           Sprint_P(true, true, true, PSTR("* [ESP] F-Series"));
@@ -1326,7 +1326,7 @@ void setup() {
   if (mqttClient.connected()) {
     Sprint_P(true, true, true, PSTR(WELCOMESTRING));
 #ifdef E_SERIES
-    Sprint_P(true, true, true, PSTR("* [ESP] E-Series"));
+    Sprint_P(true, true, true, PSTR("* [ESP] E-Series/CRC=00"));
 #endif
 #ifdef F_SERIES
     Sprint_P(true, true, true, PSTR("* [ESP] F-Series"));
@@ -1727,7 +1727,7 @@ void loop() {
               rbp += n;
             }
             if (rh == HB) Sprint_P(true, true, true, PSTR("* [MON] Buffer full, overflow not checked"));
-            if (rh > 1) {
+            if ((rh > 1) || (rh == 1) && !crc_gen) {
               if (crc_gen) rh--;
               // rh is packet length (not counting CRC byte readHex[rh])
               uint8_t crc = crc_feed;
@@ -1775,6 +1775,7 @@ void loop() {
             }
           } else if ((readBuffer[0] == 'C') || (readBuffer[0] == 'c')) {
             // timing info
+            Sprint_P(true, true, true, PSTR("* [MON] Should print scopemode output here"));
             if (outputMode & 0x1000) client_publish_mqtt(mqttHexdata, readBuffer);
           } else if (readBuffer[0] == 'E') {
             // data with errors
