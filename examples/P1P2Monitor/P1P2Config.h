@@ -38,11 +38,11 @@
 #define COMBIBOARD // define this for Uno+ESP combiboard, determines SERIALSPEED (250k instead of 115k2) and SERIAL_MAGICSTRING. Ignored if F_CPU=8MHz (as used in P1P2-ESP-Interface)
 
 // define only one of E_SERIES and F_SERIES:
-#define E_SERIES // for Daikin E* heat pumps
-//#define F_SERIES // for Daikin F* VRV systems, defining this enables "L5" and a reply to (only) 00F030; for experimenting with particular models and "L1" mode, uncomment line for your model:
+//#define E_SERIES // for Daikin E* heat pumps
+#define F_SERIES // for Daikin F* VRV systems, defining this enables "L5" and a reply to (only) 00F030; for experimenting with particular models and "L1" mode, uncomment line for your model:
 //#define FDY
 //#define FDYQ
-//#define FXMQ
+#define FXMQ
 
 #if F_CPU > 8000000L
 // Assume Arduino Uno (or Mega) hardware; use 115200 Baud for USB or 250000 Baud for combi-board

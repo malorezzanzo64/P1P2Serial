@@ -343,6 +343,8 @@ static byte pseudo0F = 0;
 
 uint8_t scope_budget = 200;
 
+static byte w38payload[20], w38 = 0;
+
 void loop() {
   uint16_t temp;
   uint16_t temphex;
@@ -519,7 +521,19 @@ void loop() {
 #endif /* E_SERIES */
 #ifdef F_SERIES
             case 'f':
-            case 'F': if (wr_cnt) {
+            case 'F': if ( (w38 = sscanf(RSp, (const char*) "%2x%2x%2x%2x%2x%2x%2x%2x%2x%2x%2x%2x%2x%2x%2x%2x%2x%2x%2x%2x", &w38payload[0], &w38payload[1], &w38payload[2], &w38payload[3], &w38payload[4], &w38payload[5], &w38payload[6], &w38payload[7], &w38payload[8], &w38payload[9], &w38payload[10], &w38payload[11], &w38payload[12], &w38payload[13], &w38payload[14], &w38payload[15], &w38payload[16], &w38payload[17], &w38payload[18], &w38payload[19])) > 0) {
+                        Serial.print(F("* Setting 00F038 payload (length "));
+                        Serial.print(w38);
+                        Serial.print(F(" to "));
+                        for (int i = 0; i < w38; i++) {
+                          if (w38payload[i] < 0x10) Serial.print('0');
+                          Serial.print(w38payload[i], HEX);
+                        }
+                        Serial.println();
+                      }
+                      break;
+/*
+                      if (wr_cnt) {
                         // previous write still being processed
                         Serial.println(F("* Previous parameter write action still busy"));
                         break;
@@ -590,6 +604,7 @@ void loop() {
                         Serial.println();
                       }
                       break;
+*/
 #endif /* F_SERIES */
             case 'g':
             case 'G': if (verbose) Serial.print(F("* Crc_gen "));
@@ -1625,24 +1640,10 @@ void loop() {
               wr = controlLevel;
               n = 3;
               break;
-            case 0x38 : // FXMQ control message, copy a few bytes back, change bytes if 'F' command is given
+            case 0x38 : // FXMQ control message, writing payload given by 'f' command
               wr = controlLevel;
-              n = 20;
-              for (w = 3; w <= 20; w++) WB[w] = 0x00;
-              WB[3]  = RB[3] & 0x01;           // W target status
-              WB[4]  = RB[5];                  // W target operating mode
-              WB[5]  = RB[7];                  // W target temperature cooling (can be changed by reply with different value)
-              WB[7]  = RB[9];                  // W target fan speed cooling/fan (11 / 31 / 51) (can be changed by reply with different value)
-              WB[9]  = RB[11];                 // W target temperature cooling (can be changed by reply with different value)
-              WB[11] = RB[13];                 // W target fan speed cooling/fan (11 / 31 / 51)
-              WB[12] = RB[14];                 // no flag?
-              WB[16] = RB[18];                 // C0, E0 when payload byte 0 set to 1
-              WB[18] = 0;                      // puzzle: initially 0, then 2, then 1 ????
-              if (wr_cnt && (wr_pt == RB[2])) {
-                if ((wr_nr == 0) && (WB[wr_nr + 3] == 0x00) && (wr_val)) WB[16] |= 0x20; // chnage payload byte 13 from C0 to E0, only if payload byte 0 is set to 1 here
-                WB[wr_nr + 3] = wr_val;
-                wr_cnt--;
-              }
+              n = w38 + 3;
+              for (w = 0; w < w38; w++) WB[w + 3] = w38payload[w];
               break;
             case 0x39 : // ??, reply with 5-byte all-zero payload
               wr = controlLevel;
