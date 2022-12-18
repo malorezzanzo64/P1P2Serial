@@ -4,6 +4,7 @@
  *
  * Copyright (c) 2019-2022 Arnold Niessen, arnold.niessen-at-gmail-dot-com - licensed under CC BY-NC-ND 4.0 with exceptions (see LICENSE.md)
  *
+ * 20221218 v0.9.29 H-link2 branch
  * 20221129 v0.9.28 option to insert message in 40F030 time slot for restart or user-defined write message
  * 20221102 v0.9.24 suppress repeated "too long" warnings
  * 20221029 v0.9.23 ADC code, fix 'W' command, misc
@@ -52,7 +53,7 @@
 #define SERIAL_MAGICSTRING "1P2P" // Serial input line should start with SERIAL_MAGICSTRING, otherwise input line is ignored
 #endif /* F_CPU */
 
-#define WELCOMESTRING "* P1P2Monitor-v0.9.28-for-H-link"
+#define WELCOMESTRING "* P1P2Monitor-v0.9.29-H-link2"
 
 #define INIT_VERBOSE 3
 // Set verbosity level

@@ -142,6 +142,7 @@ P1P2Serial P1P2Serial;
 static uint16_t sd = INIT_SD;           // delay setting for each packet written upon manual instruction (changed to 50ms which seems to be a bit safer than 0)
 static uint16_t sdto = INIT_SDTO;       // time-out delay (applies both to manual instructed writes and controller writes)
 static byte echo = INIT_ECHO;           // echo setting (whether written data is read back)
+static byte allow = ALLOW_PAUSE_BETWEEN_BYTES;
 static byte scope = INIT_SCOPE;         // scope setting (to log timing info)
 static byte counterRequest = 0;
 static byte counterRepeatingRequest = 0;
@@ -255,8 +256,6 @@ void(* resetFunc) (void) = 0; // declare reset function at address 0
 static byte pseudo0D = 0;
 static byte pseudo0E = 0;
 static byte pseudo0F = 0;
-
-uint8_t scope_budget = 200;
 
 void loop() {
   uint16_t temp;
@@ -425,19 +424,18 @@ void loop() {
                         Serial.print(F("set to "));
                       }
                       Serial.println(scope);
-                      scope_budget = 200;
                       break;
 #endif
             case 'x':
-            case 'X': if (verbose) Serial.print(F("* Echo "));
+            case 'X': if (verbose) Serial.print(F("* Allow (bits pause) "));
                       if (scanint(RSp, temp) == 1) {
-                        if (temp) temp = 1;
-                        echo = temp;
-                        P1P2Serial.setEcho(echo);
+                        allow = temp;
+                        if (allow > 76) allow = 76;
+                        P1P2Serial.setAllow(allow);
                         if (!verbose) break;
                         Serial.print(F("set to "));
                       }
-                      Serial.println(echo);
+                      Serial.println(allow);
                       break;
             case 'w':
             case 'W': if (verbose) Serial.print(F("* Writing: "));
@@ -512,10 +510,8 @@ void loop() {
 #define FREQ_DIV 3 // 8 MHz
 #endif
 
-    if (scope && ((readError && (scope_budget > 5)) || (((RB[0] == 0x40) && (RB[1] == 0xF0)) && (scope_budget > 50)) || (scope_budget > 150))) {
-      // always keep scope write budget for 40F0 and expecially for readErrors
+    if (scope) {
       if (sws_cnt || (sws_event[SWS_MAX - 1] != SWS_EVENT_LOOP)) {
-        scope_budget -= 5;
         if (readError) {
           Serial.print(F("C "));
         } else {
@@ -601,7 +597,6 @@ void loop() {
         Serial.println();
       }
     }
-    if (++scope_budget > 200) scope_budget = 200;
     sws_block = 0; // release SW_SCOPE for next log operation
 #endif
 #ifdef MEASURE_LOAD
@@ -630,18 +625,16 @@ void loop() {
       }
     }
 #endif
-    if ((readError & ERROR_REAL_MASK) && upt) { // don't count errors while upt == 0
+    if ((readError & 0xBB & ERROR_REAL_MASK) && upt) { // don't count errors while upt == 0  // suppress PE and UC errors for H-link
       if (readErrors < 0xFF) {
         readErrors++;
         readErrorLast = readError;
       }
     }
+// for H-link2, split reporting errors (if any) and data (always)
+    uint16_t delta2 = delta;
     if (readError) {
       Serial.print(F("E "));
-    } else {
-      if (verbose && (verbose < 4)) Serial.print(F("R "));
-    }
-    if (((verbose & 0x01) == 1) || readError) {
       // 3nd-12th characters show length of bus pause (max "R T 65.535: ")
       Serial.print(F("T "));
       if (delta < 10000) Serial.print(F(" "));
@@ -651,8 +644,6 @@ void loop() {
       if (delta < 10) Serial.print(F("0"));
       Serial.print(delta);
       Serial.print(F(": "));
-    }
-    if ((verbose < 4) || readError) {
       for (int i = 0; i < nread; i++) {
         if (verbose && (EB[i] & ERROR_SB)) {
           // collision suspicion due to data verification error in reading back written data
@@ -669,6 +660,10 @@ void loop() {
         if (verbose && (EB[i] & ERROR_PE)) {
           // parity error detected
           Serial.print(F("-PE:"));
+        }
+        if (verbose && (EB[i] & SIGNAL_UC)) {
+          // parity error detected
+          Serial.print(F("-UC:"));
         }
 #ifdef GENERATE_FAKE_ERRORS
         if (verbose && (EB[i] & (ERROR_SB << 8))) {
@@ -703,7 +698,7 @@ void loop() {
           Serial.print(F(" CRC error"));
         }
       }
-      if (readError) {
+      if (readError & 0xBB) {
         Serial.print(F(" readError=0x"));
         if (readError < 0x10) Serial.print('0');
         if (readError < 0x100) Serial.print('0');
@@ -711,6 +706,32 @@ void loop() {
         Serial.print(readError, HEX);
       }
       Serial.println();
+    }
+    delta = delta2;
+    if (!(readError & 0xBB)) {
+      if (verbose && (verbose < 4)) Serial.print(F("R "));
+      if ((verbose & 0x01) == 1)  {
+        // 3nd-12th characters show length of bus pause (max "R T 65.535: ")
+        Serial.print(F("T "));
+        if (delta < 10000) Serial.print(F(" "));
+        if (delta < 1000) Serial.print(F("0")); else { Serial.print(delta / 1000); delta %= 1000; };
+        Serial.print(F("."));
+        if (delta < 100) Serial.print(F("0"));
+        if (delta < 10) Serial.print(F("0"));
+        Serial.print(delta);
+        Serial.print(F(": "));
+      }
+      if (verbose < 4) {
+        for (int i = 0; i < nread; i++) {
+          byte c = RB[i];
+          if (crc_gen && (verbose == 1) && (i == nread - 1)) {
+            Serial.print(F(" CRC="));
+          }
+          if (c < 0x10) Serial.print(F("0"));
+          Serial.print(c, HEX);
+        }
+        Serial.println();
+      }
     }
   }
 #ifdef PSEUDO_PACKETS

@@ -454,7 +454,7 @@ volatile uint16_t MQTT_readBufferH = 0;
 volatile uint16_t MQTT_readBufferT = 0;
 #endif /* MQTT_INPUT_BINDATA || MQTT_INPUT_HEXDATA */
 static char* rb_buffer = readBuffer;
-static uint8_t serial_rb = 0;
+static uint16_t serial_rb = 0;
 static int c;
 static byte ESP_serial_input_Errors_Data_Short = 0;
 static byte ESP_serial_input_Errors_CRC = 0;
@@ -875,7 +875,7 @@ void onMqttMessage(char* topic, char* payload, const AsyncMqttClientMessagePrope
           MQTT_readBuffer_writeChar('R');
           MQTT_readBuffer_writeChar(' ');
         }
-        for (uint8_t i = 0; i < len; i++) MQTT_readBuffer_writeHex(payload[i]);
+        for (uint16_t i = 0; i < len; i++) MQTT_readBuffer_writeHex(payload[i]);
         if (index + len == total) MQTT_readBuffer_writeChar('\n');
       }
     } else {
@@ -893,7 +893,7 @@ void onMqttMessage(char* topic, char* payload, const AsyncMqttClientMessagePrope
         Sprint_P(true, false, false, PSTR("* [MON2] Mqtt packet input buffer overrun, dropped, index %i len %i total %i"), index, len, total);
         MQTT_drop = true;
       } else if (!MQTT_drop) {
-        for (uint8_t i = 0; i < len; i++) MQTT_readBuffer_writeChar(payload[i]);
+        for (uint16_t i = 0; i < len; i++) MQTT_readBuffer_writeChar(payload[i]);
         if (index + len == total) MQTT_readBuffer_writeChar('\n');
       }
     } else {
@@ -1775,8 +1775,11 @@ void loop() {
             }
           } else if ((readBuffer[0] == 'C') || (readBuffer[0] == 'c')) {
             // timing info
-            Sprint_P(true, true, true, PSTR("* [MON] Should print scopemode output here"));
-            if (outputMode & 0x1000) client_publish_mqtt(mqttHexdata, readBuffer);
+            // Sprint_P(false, false, true, PSTR("* [MON] Should print scopemode output here (if outputMode & 0x1000)"));
+            if (outputMode & 0x1000) {
+              client_publish_mqtt(mqttHexdata, readBuffer);
+              client_publish_telnet(mqttHexdata, readBuffer);
+            }
           } else if (readBuffer[0] == 'E') {
             // data with errors
             readBuffer[0] = '*'; // backwards output report compatibility
@@ -1794,7 +1797,7 @@ void loop() {
         char lst = *(rb_buffer - 1);
         *(rb_buffer - 1) = '\0';
         if (c != '\n') {
-          Sprint_P(true, true, true, PSTR("* [MON] Line too long, ignored, ignoring remainder: ->%s<-->%c%c<-"), readBuffer, lst, c);
+          Sprint_P(true, true, true, PSTR("* [MON] Line too long, ignored, ignoring remainder: ->%s%c%c<-"), readBuffer, lst, c);
           ignoreremainder = 1;
         } else {
           Sprint_P(true, true, true, PSTR("* [MON] Line too long, terminated, ignored: ->%s<-->%c<-"), readBuffer, lst);

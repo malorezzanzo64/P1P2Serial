@@ -7,6 +7,7 @@
  * WARNING: P1P2-bridge-esp8266 is end-of-life, and will be replaced by P1P2MQTT
  *
  * Version history
+ * 20221218 v0.9.29H H-link2 branch
  * 20221116 v0.9.28 reset-line behaviour, IPv4 EEPROM init
  * 20221112 v0.9.27 static IP support, fix to get Power_* also in HA
  * 20221109 v0.9.26 clarify WiFiManager screen, fix to accept 80-char user/password also in WiFiManager
@@ -112,9 +113,9 @@
 #define SAVEPACKETS
 // to save memory to avoid ESP instability (until P1P2MQTT is released): do not #define SAVESCHEDULE // format of schedules will change to JSON format in P1P2MQTT
 
-#define WELCOMESTRING "* [ESP] P1P2-bridge-esp8266 v0.9.28-H-link"
-#define WELCOMESTRING_TELNET "P1P2-bridge-esp8266 v0.9.28-H-link"
-#define HA_SW "0.9.28Hlink"
+#define WELCOMESTRING "* [ESP] P1P2-bridge-esp8266 v0.9.29-H-link2"
+#define WELCOMESTRING_TELNET "P1P2-bridge-esp8266 v0.9.29-H-link2"
+#define HA_SW "0.9.29Hlink2"
 
 #define AVRISP // enables flashing ATmega by ESP on P1P2-ESP-Interface
 #define SPI_SPEED_0 2e5 // for HSPI, default avrprog speed is 3e5, which is too high to be reliable; 2e5 works
@@ -211,7 +212,7 @@ char mqttInputBinData[11]= "P1P2/X";  // default accepts input from any P1P2/X/#
 #define SERIAL_MAGICSTRING "1P2P" // Each serial input line of ATmega should start with SERIAL_MAGICSTRING, otherwise it is ignored by P1P2Monitor
 #define CRC_GEN 0x00    // Default generator/Feed for CRC check; these values work at least for the Daikin hybrid
 #define CRC_FEED 0x00   // Define CRC_GEN to 0x00 means no CRC is checked when reading or added when writing
-#define SPRINT_VALUE_LEN 400 // max message length for informational and debugging output over P1P2/S, telnet, or serial
+#define SPRINT_VALUE_LEN 1000 // max message length for informational and debugging output over P1P2/S, telnet, or serial
 #define MQTT_KEY_LEN 100
 #ifdef SAVESCHEDULE
 #define MQTT_VALUE_LEN 630 // max length: Program 6* (6+8)*6*7+3*7+2 = 611
@@ -219,7 +220,7 @@ char mqttInputBinData[11]= "P1P2/X";  // default accepts input from any P1P2/X/#
 #define MQTT_VALUE_LEN 400
 #endif
 #define MAX_COMMAND_LENGTH 252 // B command can be long
-#define RB 700     // max size of readBuffer (serial input from Arduino) (was 400, changed for long-scope-mode to 700)
+#define RB 1000     // max size of readBuffer (serial input from Arduino) (was 400, changed for long-scope-mode to 1000)
 #define HB 65      // max size of hexbuf, same as P1P2Monitor (model-dependent? 24 might be sufficient)
 #define MQTT_RB 1024 // size of ring buffer for MQTT_INPUT_HEXDATA/MQTT_INPUT_BINDATA
 
