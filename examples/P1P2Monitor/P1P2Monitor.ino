@@ -34,7 +34,7 @@
  *              Support for parameter setting in P1P2Monitor is rather simple. There is no buffering, so enough time (a few seconds)
  *              is needed in between commands.
  *
- * Copyright (c) 2019-2022 Arnold Niessen, arnold.niessen-at-gmail-dot-com - licensed under CC BY-NC-ND 4.0 with exceptions (see LICENSE.md)
+ * Copyright (c) 2019-2023 Arnold Niessen, arnold.niessen-at-gmail-dot-com - licensed under CC BY-NC-ND 4.0 with exceptions (see LICENSE.md)
  *
  * Version history
  *
@@ -278,7 +278,7 @@ void loop() {
   // ((c == '\n' and rs > 0))  and/or  rs == RS_SIZE)  or  c == -1
   if (c >= 0) {
     if ((c != '\n') || (rs == RS_SIZE)) {
-      //  (c != '\n' ||  rb == RB)
+      //  (c != '\n' ||  rs == RS_SIZE)
       char lst = *(RSp - 1);
       *(RSp - 1) = '\0';
       if (c != '\n') {
@@ -310,9 +310,15 @@ void loop() {
         *(--RSp) = '\0';
       }
       if (ignoreremainder == 2) {
-        // Serial.print(F("* First line ignored: ->")); // do not copy - usually contains boot-related nonsense
-        // Serial.print(RS);
-        // Serial.println("<-");
+        Serial.print(F("* First line ignored: ->"));
+        if (rs < 10) {
+          Serial.print(RS);
+        } else {
+          RS[9] = '\0';
+          Serial.print(RS);
+          Serial.print("...");
+        }
+        Serial.println("<-");
         ignoreremainder = 0;
       } else if (ignoreremainder == 1) {
         if (!reportedTooLong) {
@@ -768,7 +774,7 @@ void loop() {
       WB[20] = 0x00;
       WB[21] = 0x00;
       WB[22] = 0x00;
-    } else { 
+    } else {
       for (int i = 3; i <= 22; i++) WB[i]  = 0x00;
     }
     if (verbose < 4) writePseudoPacket(WB, 23);

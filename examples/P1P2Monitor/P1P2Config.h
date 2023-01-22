@@ -53,7 +53,7 @@
 #define SERIAL_MAGICSTRING "1P2P" // Serial input line should start with SERIAL_MAGICSTRING, otherwise input line is ignored
 #endif /* F_CPU */
 
-#define WELCOMESTRING "* P1P2Monitor-v0.9.29-H-link2"
+#define WELCOMESTRING "* P1P2Monitor-v0.9.29Hlink2"
 
 #define INIT_VERBOSE 3
 // Set verbosity level

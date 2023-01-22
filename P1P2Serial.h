@@ -1,6 +1,6 @@
 /* P1P2Serial: Library for reading/writing Daikin/Rotex P1P2 protocol
  *
- * Version for Toshiba H-LINK with increased TX_BUFFER_SIZE and increased RX_BUFFER_SIZE (both 65, enabling messages of 64 bytes)
+ * Version for Hitachi H-LINK with increased TX_BUFFER_SIZE and increased RX_BUFFER_SIZE (both 65, enabling messages of 64 bytes)
  *
  * Copyright (c) 2019-2022 Arnold Niessen, arnold.niessen-at-gmail-dot-com - licensed under CC BY-NC-ND 4.0 with exceptions (see LICENSE.md)
  *

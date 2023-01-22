@@ -10,6 +10,10 @@ Early experiments are currently done on Hitachi systems with the code in this br
 
 I hope this project is valuable for you, so that you can help reduce CO2 emissions. You can support this project by sharing your experiences and log files, buying an interface, sponsoring this project or [buying me a coffee](https://www.buymeacoffee.com/arnoldniessen). It helps to bring functionality to other models.
 
+## Warning
+
+Any use is entirely at your own risk (CC BY-NC-ND 4.0 Section 5 applies, for earlier versions GPL sections 11 and 12 apply). Take care when writing data to the bus, or when using multiple devices on the bus (maximum bus power is unknown).
+
 **New design: P1P2-ESP-interface v1.1**
 
 ![P1P2-ESP-interface.png](circuits/P1P2-ESP-interface.png)
@@ -111,7 +115,7 @@ Version 0.9.17 uses Arduino IDE 1.8.19 and the following libraries:
 - WiFiManager 0.16.0 by tzapu (installed using Arduino IDE)
 - [AsyncMqttClient 0.9.0](https://github.com/marvinroger/async-mqtt-client) by Marvin Roger obtained with git clone or as ZIP file and extracted in Arduino's library directory
 - [ESPAsyncTCP 2.0.1](https://github.com/philbowles/ESPAsyncTCP/) by Phil Bowles obtained with git clone or as ZIP file and extracted in Arduino's library directory
-- ESP_Telnet 1.3.1 by Lennart Hennigs (installed using Arduino IDE)
+- ESP_Telnet 2.0.0 by Lennart Hennigs (installed using Arduino IDE)
 
 For 8MHz ATmega328P support, install [MCUdude's MiniCore](https://github.com/MCUdude/MiniCore) by adding [board manager URL](https://mcudude.github.io/MiniCore/package_MCUdude_MiniCore_index.json) under File/Preferences/Additional board manager URLs.
 
