@@ -7,7 +7,9 @@
  * WARNING: P1P2-bridge-esp8266 is end-of-life, and will be replaced by P1P2MQTT
  *
  * Version history
- * 20221218 v0.9.29H H-link2 branch
+ * 20230122 v0.9.31H cherry-pick main branch changes
+ * 20221218 v0.9.30H H-link2 branch
+ * 20221228 v0.9.30 switch from modified ESP_telnet library to ESP_telnet v2.0.0
  * 20221116 v0.9.28 reset-line behaviour, IPv4 EEPROM init
  * 20221112 v0.9.27 static IP support, fix to get Power_* also in HA
  * 20221109 v0.9.26 clarify WiFiManager screen, fix to accept 80-char user/password also in WiFiManager
@@ -30,11 +32,11 @@
 #ifndef P1P2_Config
 #define P1P2_Config
 
-// User configurable options: board, ethernet, hw_id, and model E_SERIES/F_SERIES
+// User configurable options: board, ethernet, hw_id, and model *_SERIES
 
 // Define one of these options below
 #define P1P2_ESP_INTERFACE_250   // define this for regular operation of P1P2-ESP-Interface (ESP8266 + ATmega328P using 250kBaud)
-//#define P1P2_ESP_INTERFACE_115 // define this for debugging P1P2-ESP-Interface, using 115.2kBaud for serial output debugging 
+//#define P1P2_ESP_INTERFACE_115 // define this for debugging P1P2-ESP-Interface, using 115.2kBaud for serial output debugging
 //                               // (in this case DO NOT connect to P1/P2), but power with 3V3 via ESP01-connector *or* with 16V DC power supply on P1/P2
 //#define ARDUINO_COMBIBOARD     // define this for Arduino/ESP8266 combi-board, using 250kBaud between ESP8266 and ATmega238P
 //#define ESP01S_MQTT            // define this for P1/P2 data input from P1P2/R MQTT topic, using 115.2kBaud for debugging over USB
@@ -52,9 +54,9 @@
                         //   1 for P1P2-ESP-Interface v1.1, October 2022, ISPAVR over BB SPI, ADC
                         //   (Note: if INIT_HW_ID is 1, BSP with modified library for ESP8266AVRISP library is required for updating firmware of ATmega328P)
 
-// define only one of E_SERIES and F_SERIES:
-#define E_SERIES // for Daikin E* heat pumps
-//#define F_SERIES // for Daikin F* VRV systems
+// define only one of H_SERIES and MHI_SERIES:
+#define H_SERIES // for Hitachi H-link systems
+//#define MHI_SERIES // for Mitsubishi Heavy Industry systems
 
 // Other options below should be OK
 
@@ -113,9 +115,9 @@
 #define SAVEPACKETS
 // to save memory to avoid ESP instability (until P1P2MQTT is released): do not #define SAVESCHEDULE // format of schedules will change to JSON format in P1P2MQTT
 
-#define WELCOMESTRING "* [ESP] P1P2-bridge-esp8266 v0.9.29-H-link2"
-#define WELCOMESTRING_TELNET "P1P2-bridge-esp8266 v0.9.29-H-link2"
-#define HA_SW "0.9.29Hlink2"
+#define WELCOMESTRING "* [ESP] P1P2-bridge-esp8266 v0.9.31Hlink2"
+#define WELCOMESTRING_TELNET "P1P2-bridge-esp8266 v0.9.31Hlink2"
+#define HA_SW "0.9.31Hlink2"
 
 #define AVRISP // enables flashing ATmega by ESP on P1P2-ESP-Interface
 #define SPI_SPEED_0 2e5 // for HSPI, default avrprog speed is 3e5, which is too high to be reliable; 2e5 works
@@ -131,15 +133,20 @@
 
 #define PSEUDO_PACKETS // define to have P1P2-bridge-esp8266 output additional P1P2-like packets with internal state information
 
-// home assistent discovery
-#define HA_PREFIX "homeassistant/sensor"      // homeassistant MQTT discovery prefix
-#define HA_DEVICE_NAME "P1P2"                 // becomes device name in HA
-#define HA_DEVICE_ID "P1P2ID12"               // uniq device_id. Currently all sensors in one device_ID
-#define HA_DEVICE_MODEL "P1P2_ESP_Interface"  // shows up as Device Info in HA
+// home assistant (including MQTT discovery)
+#define HA_PREFIX "homeassistant/sensor"   // homeassistant MQTT discovery prefix
+char haDeviceName[9] = "P1P2-xxx";         // becomes device name in HA
+#define HA_DEVICE_NAME_PREFIX 5
+char haDeviceID[10] = "P1P2IDxxx";         // uniq device_id. Currently all sensors in one device_ID
+#define HA_DEVICE_ID_PREFIX 6
+#define HA_DEVICE_MODEL "P1P2MQTT_bridge"  // shows up as Device Info in HA
 #define HA_MF "NPC"
 #define HA_KEY_LEN 100
 #define HA_VALUE_LEN 600
-#define HA_POSTFIX "_12"
+char haPostfix[5] = "_xxx";
+#define HA_POSTFIX_PREFIX 1
+#define HA_SENSOR_PREFIX "P1P2_"
+#define INIT_USE_SENSOR_PREFIX_HA 0
 
 // MQTT topics
 #define MQTT_KEY_PREFIXIP   7
@@ -230,8 +237,7 @@ char mqttInputBinData[11]= "P1P2/X";  // default accepts input from any P1P2/X/#
 #define REBOOT_REASON_WIFIMAN 0x01          // wifiManager time-out
 #define REBOOT_REASON_MQTT 0x02             // MQTT reconnect time-out
 #define REBOOT_REASON_OTA 0x03              // OTA restart
-#define REBOOT_REASON_HWID 0x04             // hwID change restart
-#define REBOOT_REASON_NOWIFI 0x05           // noWiFi change restart
+#define REBOOT_REASON_BCMD 0x04             // hwID/noWiFi/useSensorPrefixHA change restart
 #define REBOOT_REASON_ETH 0x06              // ethernet failure restart (only if noWiFi)
 #define REBOOT_REASON_STATICIP 0x06         // staticIP setting restart
 #define REBOOT_REASON_D0 0xD0               // manual restart
