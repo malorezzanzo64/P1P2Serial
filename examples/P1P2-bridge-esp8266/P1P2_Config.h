@@ -7,6 +7,7 @@
  * WARNING: P1P2-bridge-esp8266 is end-of-life, and will be replaced by P1P2MQTT
  *
  * Version history
+ * 20230205 v0.9.32H more data decoded
  * 20230122 v0.9.31H cherry-pick main branch changes
  * 20221218 v0.9.30H H-link2 branch
  * 20221228 v0.9.30 switch from modified ESP_telnet library to ESP_telnet v2.0.0
@@ -55,7 +56,7 @@
                         //   (Note: if INIT_HW_ID is 1, BSP with modified library for ESP8266AVRISP library is required for updating firmware of ATmega328P)
 
 // define only one of H_SERIES and MHI_SERIES:
-#define H_SERIES // for Hitachi H-link systems
+//#define H_SERIES // for Hitachi H-link systems
 //#define MHI_SERIES // for Mitsubishi Heavy Industry systems
 
 // Other options below should be OK
@@ -115,9 +116,9 @@
 #define SAVEPACKETS
 // to save memory to avoid ESP instability (until P1P2MQTT is released): do not #define SAVESCHEDULE // format of schedules will change to JSON format in P1P2MQTT
 
-#define WELCOMESTRING "* [ESP] P1P2-bridge-esp8266 v0.9.31Hlink2"
-#define WELCOMESTRING_TELNET "P1P2-bridge-esp8266 v0.9.31Hlink2"
-#define HA_SW "0.9.31Hlink2"
+#define WELCOMESTRING "* [ESP] P1P2-bridge-esp8266 v0.9.32Hlink2"
+#define WELCOMESTRING_TELNET "P1P2-bridge-esp8266 v0.9.32Hlink2"
+#define HA_SW "0.9.32Hlink2"
 
 #define AVRISP // enables flashing ATmega by ESP on P1P2-ESP-Interface
 #define SPI_SPEED_0 2e5 // for HSPI, default avrprog speed is 3e5, which is too high to be reliable; 2e5 works
@@ -168,8 +169,10 @@ char mqttInputBinData[11]= "P1P2/X";  // default accepts input from any P1P2/X/#
 #define MQTT_KEY_PREFIXLEN 15 // length of mqttKeyPrefix (excl '\0')
 
 // To avoid Mqtt/CPU overload and message loss, throttle mqt traffic after reboot
-#define THROTTLE_VALUE 5 // start with 20% parameter coverage, increasing in (THROTTLE_VALUE-1)*(THROTTLE_STEP) seconds to 100%
-#define THROTTLE_STEP 4  // in seconds
+//#define THROTTLE_VALUE 5 // start with 20% parameter coverage, increasing in (THROTTLE_VALUE-1)*(THROTTLE_STEP) seconds to 100%
+//#define THROTTLE_STEP 4  // in seconds
+#define THROTTLE_VALUE 15 // start with 6% parameter coverage, increasing in (THROTTLE_VALUE-1)*(THROTTLE_STEP) seconds to 100%
+#define THROTTLE_STEP 10  // in seconds
 
 // #define MQTT_PUBLISH_NONHA 1 // this is now online configuration option as (outputMode & 0x10000)
 

@@ -1,14 +1,12 @@
-# Firmware images for P1P2-ESP-Interface
+# Hitachi firmware images for P1P2MQTT bridge (previously P1P2-ESP-Interface)
 
-## P1P2Monitor firmware for ATmega328 on P1P2-ESP-Interface
+## P1P2Monitor firmware for ATmega328 on P1P2MQTT bridge
 
-These images are for the P1P2-ESP-interface v1.0 and v1.1. They do not work on the Arduino Uno.
+These images are for the P1P2-ESP-interface v1.0 and v1.1 for experimental use with Hitachi heat pumps. They do not work on the Arduino Uno.
 
-P1P2Monitor auxiliary control is currently only usable for Daikin E-series, and FDY/FDYQ F-series. Monitoring is also available for certain F-series models.
+P1P2Monitor on H-link2 only enables monitoring at this moment.
 
-[P1P2Monitor v0.9.24 for Daikin E-series](P1P2Monitor-0.9.24-Eseries.ino.hex)
-
-[P1P2Monitor v0.9.24 for Daikin E-series](P1P2Monitor-0.9.24-Fseries.ino.hex)
+Firmware image: [P1P2Monitor-H_series-v0.9.32Hlink2.ino.hex](P1P2Monitor-H_series-v0.9.32Hlink2.ino.hex)
 
 To install (Linux CLI):
 
@@ -22,13 +20,9 @@ To install (Windows CLI, using avrdude 7.0 for Windows):
 avrdude.exe -c avrisp -p m328p  -P net:<IPv4>:328 -e -Uflash:w:P1P2Monitor-0.9.24-Eseries.ino.hex:i
 ```
 
-## P1P2-bridge-esp8266 firmware for P1P2-ESP-Interface (4MB ESP8266)
+## P1P2-bridge-esp8266 firmware for ESP8266 on P1P2MQTT bridge
 
-[P1P2-bridge-esp8266 0.9.24 (P1P2-ESP-Interface version) for Daikin E-series](P1P2-bridge-esp8266-0.9.24-Eseries-P1P2-ESP-interface.ino.bin)
-
-[P1P2-bridge-esp8266 0.9.24 (P1P2-ESP-Interface version) for Daikin F-series](P1P2-bridge-esp8266-0.9.24-Fseries-P1P2-ESP-interface.ino.bin)
-
-Note to P1P2-ESP-interface v1.0 users: please do not erase the flash area of the ESP8266 when flashing these images, and if you do, you will need to reset the hardware identifier back to 0 using the 'B' command (or you will not be able to flash the ATmega328P).
+Firmware image: [P1P2-bridge-esp8266-0.9.32Hlink2-H-series-P1P2MQTT-bridge.ino.bin](P1P2-bridge-esp8266-0.9.32Hlink2-H-series-P1P2MQTT-bridge.ino.bin)
 
 To install OTA (Linux CLI):
 
@@ -59,22 +53,6 @@ yourpath\Arduino-master\tools\espota.py -i <IPv4> -p 8266 --auth=P1P2MQTT -f P1P
 ```
 yourpath\Arduino-master\tools\espota.py -i <IPv4> -p 8266 --auth=P1P2MQTT -f P1P2-bridge-esp8266-0.9.24-Fseries-4MB.ino.bin
 ```
-
-## P1P2-bridge-esp8266 firmware for 1MB ESP01s taking P1/P2 input from MQTT
-
-Uses MQTT_INPUT_HEXDATA (topic P1P2/R/#) instead of serial for P1/P2 data input, and provides debugging output over 115.2kBaud serial. ESP01S can be connected to develoment PC/laptop.
-
-[P1P2-bridge-esp8266 0.9.24 (ESP01S 1MB version, MQTT input) for Daikin E-series](P1P2-bridge-esp8266-0.9.24-Eseries-ESP01s-MQTT.ino.bin)
-
-[P1P2-bridge-esp8266 0.9.24 (ESP01S 1MB version, MQTT input) for Daikin F-series](P1P2-bridge-esp8266-0.9.24-Fseries-ESP01s-MQTT.ino.bin)
-
-## P1P2-bridge-esp8266 firmware for 1MB ESP01s taking P1/P2 input from serial input RX
-
-Uses 250kBaud serial input for P1/P2 data, and provides debugging output over MQTT. To be used with GND and TX->RX cables and ESP01S to be powered by power bank.
-
-[P1P2-bridge-esp8266 0.9.24 (ESP01S 1MB version, serial input) for Daikin E-series](P1P2-bridge-esp8266-0.9.24-Eseries-ESP01s-serial.ino.bin)
-
-[P1P2-bridge-esp8266 0.9.24 (ESP01S 1MB version, serial input) for Daikin F-series](P1P2-bridge-esp8266-0.9.24-Fseries-ESP01s-serial.ino.bin)
 
 ## FOSS notice
 
